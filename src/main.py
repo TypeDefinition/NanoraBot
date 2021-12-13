@@ -18,6 +18,7 @@ SAVE_FILE = "./modified_posts.json"
 DISCLAMER = "\n\n__Disclaimer: This bot is still in testing phase. Please forgive any mistakes nanora!__\n"
 
 # Logging
+logging.basicConfig(filename="output.log", filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
 handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
 for logger_name in ("praw", "prawcore"):
@@ -58,7 +59,8 @@ def is_top_level(comment):
 
 # Forgive me. This is my first time working with Python and web APIs.
 def main(release):
-    print("Running in release mode.\n" if release else "Running in debug mode.\n")
+    logger.info("Running in release mode.\n" if release else "Running in debug mode.\n")
+
     reddit = praw.Reddit(BOT_NAME)
     subreddits = reddit.subreddit("+".join(SUBREDDIT_LIST))
 
