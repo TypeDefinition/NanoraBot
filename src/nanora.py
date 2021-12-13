@@ -16,7 +16,7 @@ JAP_MISC_SYMBOLS = "\u31F0-\u31FF\u3220-\u3243\u3280-\u337F"
 JAP_ALPHANUM_AND_PUNCTUATIONS = "\uFF01-\uFF5E"
 WORDS = f"[{ALPHANUM}{HIRAGANA}{KATAKANA}{KANJI}]" # Working with regex has greatly reduced my lifespan.
 
-SUBREDDIT_LIST = ("u_" + BOT_NAME, BOT_NAME, "Hololive", "Hololewd", "OKBuddyHololive")
+SUBREDDIT_LIST = ("u_" + BOT_NAME, BOT_NAME, "Hololive", "Hololewd", "OKBuddyHololive", "GoodAnimemes")
 
 def is_japanese(text):
     return regex.compile(f"[{HIRAGANA}{KATAKANA}{KANJI}{HALF_WIDTH_KATAKANA_AND_PUNCTUATIONS}{JAP_MISC_SYMBOLS}{JAP_ALPHANUM_AND_PUNCTUATIONS}]").search(text)
