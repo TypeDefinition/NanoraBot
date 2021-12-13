@@ -10,8 +10,7 @@ import nanora
 from nanora import nanora
 from nanora import TRIGGER
 from nanora import BOT_NAME
-from nanora import DEBUG_SUBREDDIT_LIST
-from nanora import RELEASE_SUBREDDIT_LIST
+from nanora import SUBREDDIT_LIST
 
 # Constants
 WAIT_TIME = 5
@@ -60,10 +59,10 @@ def is_top_level(comment):
 def main(debug):
     print("Running in debug mode.\n" if debug else "Running in release mode.\n")
     reddit = praw.Reddit(BOT_NAME)
-    subreddits = reddit.subreddit("+".join(DEBUG_SUBREDDIT_LIST if debug else RELEASE_SUBREDDIT_LIST))
+    subreddits = reddit.subreddit("+".join(SUBREDDIT_LIST))
 
     # Load_file IDs of posts we've already modified.
-    modified_posts = load_file()
+    modified_posts = set() if debug else load_file()
 
     # Scan each comment in the subreddits.
     while True:
@@ -80,7 +79,6 @@ def main(debug):
                     continue
 
                 # Modify parent text.
-                modified_text = None
                 if is_top_level(comment):
                     modified_text = nanora(comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
                 else:
@@ -88,14 +86,13 @@ def main(debug):
                 modified_text += DISCLAMER
 
                 # Reply to comment.
-                if debug:
-                    print(modified_text)
-                else:
+                if not debug:
                     comment.reply(modified_text)
                     modified_posts.add(comment.parent().id)
                     save_file(modified_posts)
 
                 logger.info(f"Replied to: https://www.reddit.com{comment.permalink}")
+                print(modified_text)
         except KeyboardInterrupt:
             print("Keyboard interrupt. Terminating...")
             break
