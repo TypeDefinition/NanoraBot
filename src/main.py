@@ -15,7 +15,7 @@ from nanora import SUBREDDIT_LIST
 # Constants
 WAIT_TIME = 5
 SAVE_FILE = "./modified_posts.json"
-DISCLAMER = "\n\n__Disclaimer: This bot is still in testing phase. Please forgive any mistakes nora!__\n"
+DISCLAMER = "\n\n__Disclaimer: This bot is still in testing phase. Please forgive any mistakes nanora!__\n"
 
 # Logging
 handler = logging.StreamHandler()
@@ -56,13 +56,14 @@ def has_trigger(text):
 def is_top_level(comment):
     return comment.parent_id == comment.link_id
 
-def main(debug):
-    print("Running in debug mode.\n" if debug else "Running in release mode.\n")
+# Forgive me. This is my first time working with Python and web APIs.
+def main(release):
+    print("Running in release mode.\n" if release else "Running in debug mode.\n")
     reddit = praw.Reddit(BOT_NAME)
     subreddits = reddit.subreddit("+".join(SUBREDDIT_LIST))
 
     # Load_file IDs of posts we've already modified.
-    modified_posts = set() if debug else load_file()
+    modified_posts = load_file() if release else set()
 
     # Scan each comment in the subreddits.
     while True:
@@ -86,11 +87,12 @@ def main(debug):
                 modified_text += DISCLAMER
 
                 # Reply to comment.
-                if not debug:
+                if release:
                     comment.reply(modified_text)
                     modified_posts.add(comment.parent().id)
                     save_file(modified_posts)
 
+                # Log reply.
                 logger.info(f"Replied to: https://www.reddit.com{comment.permalink}")
                 print(modified_text)
         except KeyboardInterrupt:
@@ -107,7 +109,7 @@ def main(debug):
             time.sleep(WAIT_TIME)
 
 if __name__ == "__main__":
-    if sys.argv[1].lower() == "false":
-        main(False)
-    else:
+    if sys.argv[1].lower() == "true":
         main(True)
+    else:
+        main(False)

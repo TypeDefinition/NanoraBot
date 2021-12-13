@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 ./src/main.py false
+python3 ./src/main.py True
