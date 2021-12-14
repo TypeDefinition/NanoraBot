@@ -90,6 +90,8 @@ def nanora(text):
                     keyword = "RA"
                 elif text[insert_idx-len("NA"):insert_idx] == "NA":
                     keyword = "NORA"
+                elif text[insert_idx-1:insert_idx].isupper():
+                    keyword = " NANORA"
                 else:
                     keyword = " nanora"
         except AttributeError: # The entire string is just non-alphanumeric.
