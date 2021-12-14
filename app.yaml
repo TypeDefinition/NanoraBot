@@ -1,0 +1,2 @@
+# Configuration file for Google Cloud.
+runtime: python39 # or another supported version
