@@ -23,7 +23,7 @@ LOG_FILE =  PARENT_DIR + "/output.log"
 DISCLAMER = "\n\n__Disclaimer: This bot is still in testing phase. Please forgive any mistakes nanora!__\n"
 
 # Logging
-logging.basicConfig(filename=LOG_FILE, filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
+# logging.basicConfig(filename=LOG_FILE, filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
 handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
 for logger_name in ("praw", "prawcore"):
