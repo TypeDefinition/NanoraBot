@@ -6,6 +6,8 @@ import sys
 import time
 import traceback
 import nanora
+import pathlib
+import os
 
 from nanora import nanora
 from nanora import TRIGGER
@@ -13,12 +15,15 @@ from nanora import BOT_NAME
 from nanora import SUBREDDIT_LIST
 
 # Constants
-WAIT_TIME = 5
-SAVE_FILE = "./modified_posts.json"
+BOOT_TIME = 5
+WAIT_TIME = 10
+PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
+SAVE_FILE = PARENT_DIR + "/modified_posts.json"
+LOG_FILE =  PARENT_DIR + "/output.log"
 DISCLAMER = "\n\n__Disclaimer: This bot is still in testing phase. Please forgive any mistakes nanora!__\n"
 
 # Logging
-logging.basicConfig(filename="output.log", filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
+logging.basicConfig(filename=LOG_FILE, filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
 handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
 for logger_name in ("praw", "prawcore"):
@@ -60,6 +65,7 @@ def is_top_level(comment):
 # Forgive me. This is my first time working with Python and web APIs.
 def main(release):
     logger.info("Running in release mode.\n" if release else "Running in debug mode.\n")
+    time.sleep(BOOT_TIME)
 
     reddit = praw.Reddit(BOT_NAME)
     subreddits = reddit.subreddit("+".join(SUBREDDIT_LIST))
