@@ -12,7 +12,6 @@ import os
 from nanora import nanora
 from nanora import TRIGGER
 from nanora import BOT_NAME
-from nanora import SUBREDDIT_LIST
 
 # Constants
 BOOT_TIME = 5
@@ -21,6 +20,21 @@ PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/modified_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"
 DISCLAMER = "\n\n__Disclaimer: This bot is still in testing phase. Please forgive any mistakes nanora!__\n"
+SUBREDDIT_LIST = ("u_" + BOT_NAME, BOT_NAME, \
+    "Hololive", \
+    "Hololewd", \
+    "OKBuddyHololive", \
+    "Himemori_Luna", \
+    "NinomaeInanis", \
+    "AmeliaWatson", \
+    "GawrGura", \
+    "CalliopeMori", \
+    "TakanashiKiara_HoloEN", \
+    "TakaMori", \
+    "GoodAnimemes", \
+    "VirtualYoutubers", \
+    "VtuberV8", \
+    "Singapore")
 
 # Logging
 # logging.basicConfig(filename=LOG_FILE, filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
