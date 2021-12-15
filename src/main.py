@@ -40,7 +40,8 @@ CENSORED_SUBREDDIT_LIST = ( \
     "VirtualYoutubers", \
     "VtuberV8", \
     "Singapore", \
-    "NUS")
+    "NUS", \
+    "HololiveYuri")
 
 # Logging
 # logging.basicConfig(filename=LOG_FILE, filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
