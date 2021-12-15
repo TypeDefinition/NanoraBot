@@ -95,6 +95,7 @@ def main(release):
     # Scan each comment in the subreddits.
     while True:
         try:
+            # The first time this starts, it returns 100 historical comments. After that, it only listens for new comments.
             for comment in subreddits.stream.comments():
                 # Do not reply to our own comments.
                 if comment.author.name == BOT_NAME:
