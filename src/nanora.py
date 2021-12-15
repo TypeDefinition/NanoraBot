@@ -7,17 +7,37 @@ TRIGGER = "!nanora"
 FAILED_MESSAGE = "Sorry! I am unable to nanora that for some reason!"
 
 ZERO_WIDTH_SPACE = "\u200B" # Note: len(ZERO_WIDTH_SPACE) is 1.
+
 ALPHANUM = "a-zA-Z0-9"
 HIRAGANA = "\u3041-\u3096"
 KATAKANA = "\u30A0-\u30FF"
-KANJI = "\u2E80-\u2FD5"
+KANJI = "\u3400-\u4DB5\u4E00-\u9FCB\uF900-\uFA6A"
+KANJI_RADICALS = "\u2E80-\u2FD5"
 HALF_WIDTH_KATAKANA_AND_PUNCTUATIONS = "\uFF5F-\uFF9F"
 JAP_MISC_SYMBOLS = "\u31F0-\u31FF\u3220-\u3243\u3280-\u337F"
 JAP_ALPHANUM_AND_PUNCTUATIONS = "\uFF01-\uFF5E"
-WORDS = f"[{ALPHANUM}{HIRAGANA}{KATAKANA}{KANJI}]" # Working with regex has greatly reduced my lifespan.
+WORDS = f"[{ALPHANUM}{HIRAGANA}{KATAKANA}{KANJI}{KANJI_RADICALS}]" # Working with regex has greatly reduced my lifespan.
+
+EN_PUNCTUATION = ('.', '?', '!', '\]', '\n')
+JP_PUNCTUATION = ('。', '？', '！', '」', '・', '”', '】', '』', '；', '、')
+PUNCTUATION = EN_PUNCTUATION + JP_PUNCTUATION
+
+LOWERCASE_NORABLE = "[a-z]a"
+UPPERCASE_NORABLE = "[A-Z]A"
+HIRAGANA_NORABLE = rf"[{HIRAGANA}]?[かさたなまやがざだばぱ]|ああ|です"
+KATAKANA_NORABLE = rf"[{KATAKANA}]?[カサタナハマヤガザダバパ]|アア"
+
+# Pattern looks incomprehensible, but it just matches links, and any punctuation at the end (plus parenthesis).
+LINK_PATTERN = rf'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]*\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)([{"".join(PUNCTUATION)})])*'
+# Pattern matches any punctuation, with the exception of those in spoiler tags.
+PUNCTUATION_PATTERN = rf'(?<!<|!>)([{"".join(PUNCTUATION)}]+)(?!>)'
+# Pattern matches words that may be able to end with a "のら".
+NANORA_PATTERN = rf'{WORDS}+(no|NO|{LOWERCASE_NORABLE}|{UPPERCASE_NORABLE}|の|ノ|{HIRAGANA_NORABLE}|{KATAKANA_NORABLE})\b'
+# Pattern matches anywhere we want to insert a keyword.
+INSERTION_PATTERN = rf'(?<!({LINK_PATTERN}))({PUNCTUATION_PATTERN}|{NANORA_PATTERN})'
 
 def is_japanese(text):
-    return regex.compile(f"[{HIRAGANA}{KATAKANA}{KANJI}{HALF_WIDTH_KATAKANA_AND_PUNCTUATIONS}{JAP_MISC_SYMBOLS}{JAP_ALPHANUM_AND_PUNCTUATIONS}]").search(text)
+    return regex.compile(f"[{HIRAGANA}{KATAKANA}{KANJI}{KANJI_RADICALS}{HALF_WIDTH_KATAKANA_AND_PUNCTUATIONS}{JAP_MISC_SYMBOLS}{JAP_ALPHANUM_AND_PUNCTUATIONS}]").search(text)
 
 def is_hiragana(text):
     return regex.compile(f"[{HIRAGANA}]").search(text)
@@ -29,30 +49,15 @@ def nanora(text, censor):
     text += '\n' # Just to make the matching work if the text doesn't already include a newline at the end.
     modified_text = text
 
-    en_punctuation_list = ['.', '?', '!', '\]', '\n']
-    jp_punctuation_list = ['。', '？', '！', '」', '・', '”', '】', '』', '；']
-    punctuation_list = en_punctuation_list + jp_punctuation_list
-
-    # Pattern looks incomprehensible, but it just matches links, and any punctuation at the end (plus parenthesis).
-    link_pattern = rf'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]*\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)([{"".join(punctuation_list)})])*'
-    # Pattern matches any punctuation, with the exception of those in spoiler tags.
-    punctuation_pattern = rf'(?<!<|!>)([{"".join(punctuation_list)}]+)(?!>)'
-    # Pattern matches any words that ends with "na", "no", "な" or "の", excluding these by themselves.
-    nano_pattern = rf'{WORDS}+(na|no|NA|NO|な|の|ナ|ノ)\b'
-    # Pattern matches any english or japanese words.
-    word_pattern = rf"{WORDS}"
-    # Pattern matches anywhere we want to insert a keyword.
-    insertion_pattern = rf'(?<!({link_pattern}))({punctuation_pattern}|{nano_pattern})'
-
     offset = 0 # Everytime we insert a keyword, the length of the text grows.
     last_insert_idx = -1 # Sometimes there is a punctuation immediately after a word we nanora-ed. In that case, do not nanora it again.
-    for match in regex.finditer(rf"{insertion_pattern}", text):
+    for match in regex.finditer(rf"{INSERTION_PATTERN}", text):
         try:
-            if regex.search(rf"{punctuation_pattern}", text[match.start()]): # If this is a punctuation, we want to add the keyword BEFORE the punctuation.
-                last_alphanum = regex.search(rf"{WORDS}", text[match.start()::-1])
-                insert_idx = match.start() - last_alphanum.start() + 1
+            if regex.search(rf"{PUNCTUATION_PATTERN}", text[match.start()]): # If this is a punctuation, we want to add the keyword BEFORE the punctuation.
+                last_word_char = regex.search(rf"{WORDS}", text[match.start()::-1])
+                insert_idx = match.start() - last_word_char.start() + 1
             else: # If this is a word, we want to add the keyword AFTER the word.
-                last_alphanum = regex.search(rf"{WORDS}", text[match.end()-1::-1])
+                last_word_char = regex.search(rf"{WORDS}", text[match.end()-1::-1])
                 insert_idx = match.end()
 
             if insert_idx == last_insert_idx:
@@ -66,33 +71,29 @@ def nanora(text, censor):
                 continue
 
             # Decide the keyword based on the previous word.
-            if is_japanese(last_alphanum.group()):
-                if text[insert_idx-len("の"):insert_idx] == "の":
+            if is_japanese(last_word_char.group()):
+                if text[insert_idx-1] == "の":
                     keyword = "ら"
-                elif text[insert_idx-len("な"):insert_idx] == "な":
-                    keyword = "のら"
-                elif text[insert_idx-len("ノ"):insert_idx] == "ノ":
+                elif text[insert_idx-1] == "ノ":
                     keyword = "ラ"
-                elif text[insert_idx-len("ナ"):insert_idx] == "ナ":
+                elif regex.search(rf"({HIRAGANA_NORABLE})", text[insert_idx-2:insert_idx]):
+                    keyword = "のら"
+                elif regex.search(rf"({KATAKANA_NORABLE})", text[insert_idx-2:insert_idx]):
                     keyword = "ノラ"
-                elif is_katakana(last_alphanum.group()):
-                    keyword = "ナノラ"
                 else:
-                    keyword = "なのら"
+                    keyword = "ナノラ" if is_katakana(text[insert_idx-1]) else "なのら"
             else:
-                if text[insert_idx-len("no"):insert_idx] == "no":
+                if text[insert_idx-2:insert_idx] == "no":
                     keyword = "ra"
-                elif text[insert_idx-len("na"):insert_idx] == "na":
-                    keyword = "nora"
-                elif text[insert_idx-len("NO"):insert_idx] == "NO":
+                elif text[insert_idx-2:insert_idx] == "NO":
                     keyword = "RA"
-                elif text[insert_idx-len("NA"):insert_idx] == "NA":
+                elif regex.search(rf"({LOWERCASE_NORABLE})", text[insert_idx-2:insert_idx]):
+                    keyword = "nora"
+                elif regex.search(rf"({UPPERCASE_NORABLE})", text[insert_idx-2:insert_idx]):
                     keyword = "NORA"
-                elif text[insert_idx-1:insert_idx].isupper():
-                    keyword = " NANORA"
                 else:
-                    keyword = " nanora"
-        except AttributeError: # The entire string is just non-alphanumeric.
+                    keyword = " NANORA" if text[insert_idx-1].isupper() else " nanora"
+        except AttributeError: # The entire string does not contain any words.
             continue
 
         # Ignore triggers.

@@ -28,6 +28,7 @@ UNCENSORED_SUBREDDIT_LIST = ( \
 
 CENSORED_SUBREDDIT_LIST = ( \
     "u_" + BOT_NAME, \
+    BOT_NAME, \
     "Hololive", \
     "Himemori_Luna", \
     "NinomaeInanis", \
@@ -81,16 +82,17 @@ def has_trigger(text):
 def is_top_level(comment):
     return comment.parent_id == comment.link_id
 
-# Forgive me. This is my first time working with Python and web APIs.
 def main(release):
-    logger.info("Running in release mode.\n" if release else "Running in debug mode.\n")
-    time.sleep(BOOT_TIME)
+    if release:
+        logger.info("Running in release mode.\nApplication starting in " + str(BOOT_TIME) + " seconds.\n")
+        time.sleep(BOOT_TIME)
+        modified_posts = load_file() # Load IDs of posts we've already modified.
+    else:
+        logger.info("Running in debug mode.\n")
+        modified_posts = set() # Pretend we haven't replied to any posts.
 
     reddit = praw.Reddit(BOT_NAME)
     subreddits = reddit.subreddit("+".join(UNCENSORED_SUBREDDIT_LIST + CENSORED_SUBREDDIT_LIST))
-
-    # Load_file IDs of posts we've already modified.
-    modified_posts = load_file() if release else set()
 
     # Scan each comment in the subreddits.
     while True:
@@ -123,9 +125,9 @@ def main(release):
 
                 # Log reply.
                 logger.info(f"Replied to: https://www.reddit.com{comment.permalink}")
-                print(modified_text)
+                logger.info(modified_text)
         except KeyboardInterrupt:
-            print("Keyboard interrupt. Terminating...")
+            logger.info("Keyboard interrupt. Terminating...")
             break
         except praw.exceptions.RedditAPIException:
             logger.error(f"RedditAPIException: {traceback.format_exc()}")
@@ -134,8 +136,9 @@ def main(release):
         except Exception:
             logger.error(f"Unhandled exception: {traceback.format_exc()}")
         finally:
-            logger.info(f"Program sleeping.")
-            time.sleep(WAIT_TIME)
+            if release:
+                logger.info(f"Program sleeping.")
+                time.sleep(WAIT_TIME)
 
 if __name__ == "__main__":
     main(eval(sys.argv[1]))
