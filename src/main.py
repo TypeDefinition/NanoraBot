@@ -34,7 +34,8 @@ SUBREDDIT_LIST = ("u_" + BOT_NAME, BOT_NAME, \
     "GoodAnimemes", \
     "VirtualYoutubers", \
     "VtuberV8", \
-    "Singapore")
+    "Singapore", \
+    "NUS")
 
 # Logging
 # logging.basicConfig(filename=LOG_FILE, filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
