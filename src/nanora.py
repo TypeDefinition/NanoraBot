@@ -25,7 +25,7 @@ def is_hiragana(text):
 def is_katakana(text):
     return regex.compile(f"[{KATAKANA}]").search(text)
 
-def nanora(text):
+def nanora(text, censor):
     text += '\n' # Just to make the matching work if the text doesn't already include a newline at the end.
     modified_text = text
 
@@ -110,10 +110,10 @@ def nanora(text):
     # Check if text was successfully modified.
     if modified_text == text:
         return FAILED_MESSAGE
-
     # Add zero-width whitespace to disable mentioning usernames.
     modified_text = modified_text[:-1].replace('u/',f'u{ZERO_WIDTH_SPACE}/')
     # Censor profanity.
-    modified_text = better_profanity.profanity.censor(modified_text, '\*')
+    if censor:
+        modified_text = better_profanity.profanity.censor(modified_text, '\*')
 
     return modified_text

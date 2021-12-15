@@ -20,10 +20,15 @@ PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/modified_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"
 DISCLAMER = "\n\n__Disclaimer: I am still in testing phase. Please forgive any mistakes nanora!__\n\n__Note: I currently cannot post in r/Hololive due to low karma.__\n"
-SUBREDDIT_LIST = ("u_" + BOT_NAME, BOT_NAME, \
-    "Hololive", \
-    "Hololewd", \
+
+UNCENSORED_SUBREDDIT_LIST = ( \
     "OKBuddyHololive", \
+    "GoodAnimemes", \
+    "Hololewd")
+
+CENSORED_SUBREDDIT_LIST = ( \
+    "u_" + BOT_NAME, \
+    "Hololive", \
     "Himemori_Luna", \
     "NinomaeInanis", \
     "AmeliaWatson", \
@@ -31,7 +36,6 @@ SUBREDDIT_LIST = ("u_" + BOT_NAME, BOT_NAME, \
     "CalliopeMori", \
     "TakanashiKiara_HoloEN", \
     "TakaMori", \
-    "GoodAnimemes", \
     "VirtualYoutubers", \
     "VtuberV8", \
     "Singapore", \
@@ -83,7 +87,7 @@ def main(release):
     time.sleep(BOOT_TIME)
 
     reddit = praw.Reddit(BOT_NAME)
-    subreddits = reddit.subreddit("+".join(SUBREDDIT_LIST))
+    subreddits = reddit.subreddit("+".join(UNCENSORED_SUBREDDIT_LIST + CENSORED_SUBREDDIT_LIST))
 
     # Load_file IDs of posts we've already modified.
     modified_posts = load_file() if release else set()
@@ -104,9 +108,10 @@ def main(release):
 
                 # Modify parent text.
                 if is_top_level(comment):
-                    modified_text = nanora(comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
+                    modified_text = (comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
                 else:
-                    modified_text = nanora(comment.parent().body)
+                    modified_text = comment.parent().body
+                modified_text = nanora(modified_text, comment.subreddit.name in CENSORED_SUBREDDIT_LIST)
                 modified_text += DISCLAMER
 
                 # Reply to comment.
@@ -132,7 +137,4 @@ def main(release):
             time.sleep(WAIT_TIME)
 
 if __name__ == "__main__":
-    if sys.argv[1].lower() == "true":
-        main(True)
-    else:
-        main(False)
+    main(eval(sys.argv[1]))
