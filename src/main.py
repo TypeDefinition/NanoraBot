@@ -39,7 +39,7 @@ CENSORED_SUBREDDIT_LIST = ( \
     "TakaMori", \
     "VirtualYoutubers", \
     "VtuberV8", \
-    "HololiveYuri" \
+    "HololiveYuri", \
     "Singapore", \
     "NUS")
 
