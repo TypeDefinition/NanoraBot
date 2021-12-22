@@ -1,1 +1,2 @@
-NanoraBot was made by modifying pekofy_bot.
+u/NanoraBot
+Reddit User Link: https://www.reddit.com/user/NanoraBot/
