@@ -19,7 +19,7 @@ WAIT_TIME = 10
 PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/modified_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"
-DISCLAMER = "\n\n__Disclaimer: I am still in testing phase. Please forgive any mistakes nanora!__\n\n__Note: I currently cannot post in r/Hololive due to low karma.__\n"
+DISCLAMER = "\n\n__Note: I do not work r/Hololive as my comments are removed by the AutoModerator for some reason.__\n"
 
 UNCENSORED_SUBREDDIT_LIST = ( \
     "OKBuddyHololive", \
