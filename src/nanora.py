@@ -73,26 +73,26 @@ def nanora(text, censor):
             # Decide the keyword based on the previous word.
             if is_japanese(last_word_char.group()):
                 if text[insert_idx-1] == "の":
-                    keyword = "ら"
+                    keyword = "ーら"
                 elif text[insert_idx-1] == "ノ":
-                    keyword = "ラ"
+                    keyword = "ーラ"
                 elif regex.search(rf"({HIRAGANA_NORABLE})", text[insert_idx-2:insert_idx]):
-                    keyword = "のら"
+                    keyword = "ーのら"
                 elif regex.search(rf"({KATAKANA_NORABLE})", text[insert_idx-2:insert_idx]):
-                    keyword = "ノラ"
+                    keyword = "ーノラ"
                 else:
-                    keyword = "ナノラ" if is_katakana(text[insert_idx-1]) else "なのら"
+                    keyword = "ーナノラ" if is_katakana(text[insert_idx-1]) else "ーなのら"
             else:
                 if text[insert_idx-2:insert_idx] == "no":
-                    keyword = "ra"
+                    keyword = "-ra"
                 elif text[insert_idx-2:insert_idx] == "NO":
-                    keyword = "RA"
+                    keyword = "-RA"
                 elif regex.search(rf"({LOWERCASE_NORABLE})", text[insert_idx-2:insert_idx]):
-                    keyword = "nora"
+                    keyword = "-nora"
                 elif regex.search(rf"({UPPERCASE_NORABLE})", text[insert_idx-2:insert_idx]):
-                    keyword = "NORA"
+                    keyword = "-NORA"
                 else:
-                    keyword = " NANORA" if text[insert_idx-1].isupper() else " nanora"
+                    keyword = "-NANORA" if text[insert_idx-1].isupper() else "-nanora"
         except AttributeError: # The entire string does not contain any words.
             continue
 
