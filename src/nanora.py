@@ -1,10 +1,13 @@
-import regex
 import better_profanity
+import random
+import regex
 
 # Constants
 BOT_NAME = "NanoraBot"
-TRIGGER = "!nanora"
+TRIGGER_NANORA = "!nanora"
+TRIGGER_GOOD_BOT = "good bot"
 FAILED_MESSAGE = "Sorry! I am unable to nanora that for some reason!"
+THANK_MESSAGES = ["Thank you nanora!", "uwu :3", "ありがちゅ！", "すっ、すき…\n\n\n\nバ、バカ！", "ぎゅ〜 <3"]
 
 ZERO_WIDTH_SPACE = "\u200B" # Note: len(ZERO_WIDTH_SPACE) is 1.
 
@@ -44,6 +47,9 @@ def is_hiragana(text):
 
 def is_katakana(text):
     return regex.compile(f"[{KATAKANA}]").search(text)
+
+def get_thank_message():
+    return THANK_MESSAGES[random.randrange(0, len(THANK_MESSAGES))]
 
 def nanora(text, censor):
     text += '\n' # Just to make the matching work if the text doesn't already include a newline at the end.
@@ -97,7 +103,7 @@ def nanora(text, censor):
             continue
 
         # Ignore triggers.
-        if text[insert_idx-len(TRIGGER):insert_idx] == TRIGGER:
+        if text[insert_idx-len(TRIGGER_NANORA):insert_idx] == TRIGGER_NANORA:
             continue
 
         # Ignore zero width spaces.

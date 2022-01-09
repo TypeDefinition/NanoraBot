@@ -9,9 +9,11 @@ import nanora
 import pathlib
 import os
 
-from nanora import nanora
-from nanora import TRIGGER
+from nanora import TRIGGER_NANORA
+from nanora import TRIGGER_GOOD_BOT
 from nanora import BOT_NAME
+from nanora import nanora
+from nanora import get_thank_message
 
 # Constants
 BOOT_TIME = 5
@@ -76,8 +78,8 @@ def is_valid_post(post, modified_posts):
         return False
     return True
 
-def has_trigger(text):
-    return regex.compile(rf"{TRIGGER}", flags=regex.IGNORECASE).search(text)
+def has_trigger(text, trigger):
+    return regex.compile(rf"{trigger}", flags=regex.IGNORECASE).search(text)
 
 def is_top_level(comment):
     return comment.parent_id == comment.link_id
@@ -104,27 +106,33 @@ def main(release):
                     continue
                 if not is_valid_post(comment, modified_posts):
                     continue
-                if not has_trigger(comment.body):
-                    continue
                 if not is_valid_post(comment.parent(), modified_posts):
                     continue
-
-                # Modify parent text.
-                if is_top_level(comment):
-                    modified_text = (comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
+                
+                # Reply to !nanora.
+                if has_trigger(comment.body, TRIGGER_NANORA):
+                    # Modify parent text.
+                    if is_top_level(comment):
+                        reply = (comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
+                    else:
+                        reply = comment.parent().body
+                    reply = nanora(reply, comment.subreddit.name in CENSORED_SUBREDDIT_LIST)
+                # Reply to Good Bot!
+                elif has_trigger(comment.body, TRIGGER_GOOD_BOT) and comment.parent().author.name == BOT_NAME:
+                    reply = get_thank_message()
                 else:
-                    modified_text = comment.parent().body
-                modified_text = nanora(modified_text, comment.subreddit.name in CENSORED_SUBREDDIT_LIST)
+                    continue
 
                 # Reply to comment.
                 if release:
-                    comment.reply(modified_text)
+                    comment.reply(reply)
                     modified_posts.add(comment.parent().id)
                     save_file(modified_posts)
 
                 # Log reply.
                 logger.info(f"Replied to: https://www.reddit.com{comment.permalink}")
-                logger.info(modified_text)
+                logger.info(reply)
+                
         except KeyboardInterrupt:
             logger.info("Keyboard interrupt. Terminating...")
             break
