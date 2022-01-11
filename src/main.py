@@ -19,7 +19,7 @@ from nanora import get_thank_message
 BOOT_TIME = 5
 WAIT_TIME = 10
 PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
-SAVE_FILE = PARENT_DIR + "/modified_posts.json"
+SAVE_FILE = PARENT_DIR + "/replied_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"
 
 UNCENSORED_SUBREDDIT_LIST = ( \
@@ -63,20 +63,22 @@ def load_file():
     except:
         return set()
 
-def save_file(modified_posts):
+def save_file(replied_posts):
     file = open(SAVE_FILE, "w+")
-    file.write(jsonpickle.encode(modified_posts))
+    file.write(jsonpickle.encode(replied_posts))
     file.close()
 
-# Checks if a submission or comment is valid.
-def is_valid_post(post, modified_posts):
+def is_deleted_post(post):
     if not post.author:
         logger.info(f"Deleted post: https://www.reddit.com{post.permalink}")
-        return False
-    if post.id in modified_posts:
+        return True
+    return False
+
+def is_replied_post(post, replied_posts):
+    if post.id in replied_posts:
         logger.info(f"Already replied: https://www.reddit.com{post.permalink}")
-        return False
-    return True
+        return True
+    return False
 
 def has_trigger(text, trigger):
     return regex.compile(rf"{trigger}", flags=regex.IGNORECASE).search(text)
@@ -88,10 +90,10 @@ def main(release):
     if release:
         logger.info("Running in release mode.\nApplication starting in " + str(BOOT_TIME) + " seconds.\n")
         time.sleep(BOOT_TIME)
-        modified_posts = load_file() # Load IDs of posts we've already modified.
+        replied_posts = load_file() # Load IDs of posts we've already modified.
     else:
         logger.info("Running in debug mode.\n")
-        modified_posts = set() # Pretend we haven't replied to any posts.
+        replied_posts = set() # Pretend we haven't replied to any posts.
 
     reddit = praw.Reddit(BOT_NAME)
     subreddits = reddit.subreddit("+".join(UNCENSORED_SUBREDDIT_LIST + CENSORED_SUBREDDIT_LIST))
@@ -104,9 +106,9 @@ def main(release):
                 # Do not reply to our own comments.
                 if comment.author.name == BOT_NAME:
                     continue
-                if not is_valid_post(comment, modified_posts):
+                if is_deleted_post(comment) or is_replied_post(comment, replied_posts):
                     continue
-                if not is_valid_post(comment.parent(), modified_posts):
+                if is_deleted_post(comment.parent()):
                     continue
                 
                 # Reply to !nanora.
@@ -126,8 +128,8 @@ def main(release):
                 # Reply to comment.
                 if release:
                     comment.reply(reply)
-                    modified_posts.add(comment.parent().id)
-                    save_file(modified_posts)
+                    replied_posts.add(comment.id)
+                    save_file(replied_posts)
 
                 # Log reply.
                 logger.info(f"Replied to: https://www.reddit.com{comment.permalink}")
