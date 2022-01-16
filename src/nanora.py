@@ -98,7 +98,7 @@ def nanora(text, censor):
                 elif regex.search(rf"({UPPERCASE_NORABLE})", text[insert_idx-2:insert_idx]):
                     keyword = "-NORA"
                 else:
-                    keyword = "-NANORA" if text[insert_idx-1].isupper() else "-nanora"
+                    keyword = " NANORA" if text[insert_idx-1].isupper() else " nanora"
         except AttributeError: # The entire string does not contain any words.
             continue
 
