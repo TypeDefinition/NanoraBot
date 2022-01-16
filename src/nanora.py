@@ -79,15 +79,15 @@ def nanora(text, censor):
             # Decide the keyword based on the previous word.
             if is_japanese(last_word_char.group()):
                 if text[insert_idx-1] == "の":
-                    keyword = "ーら"
+                    keyword = "-ら"
                 elif text[insert_idx-1] == "ノ":
-                    keyword = "ーラ"
+                    keyword = "-ラ"
                 elif regex.search(rf"({HIRAGANA_NORABLE})", text[insert_idx-2:insert_idx]):
-                    keyword = "ーのら"
+                    keyword = "-のら"
                 elif regex.search(rf"({KATAKANA_NORABLE})", text[insert_idx-2:insert_idx]):
-                    keyword = "ーノラ"
+                    keyword = "-ノラ"
                 else:
-                    keyword = "ーナノラ" if is_katakana(text[insert_idx-1]) else "ーなのら"
+                    keyword = " ナノラ" if is_katakana(text[insert_idx-1]) else " なのら"
             else:
                 if text[insert_idx-2:insert_idx] == "no":
                     keyword = "-ra"
