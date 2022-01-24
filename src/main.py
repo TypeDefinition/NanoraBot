@@ -140,10 +140,10 @@ def main(release):
                 elif has_trigger(comment.body, TRIGGER_NTF):
                     reply = get_ntf_message()
                 # Reply to Good Bot!
-                elif has_trigger(comment.body, TRIGGER_GOOD_BOT) and comment.parent().author.name == BOT_NAME:
+                elif has_trigger(comment.body, TRIGGER_GOOD_BOT) and is_author(comment.parent(), BOT_NAME):
                     reply = get_thank_message()
                 # Reply to u/pekofy_bot giving up replying to u/NanoraBot due to possible spam.
-                elif has_trigger(comment.body, TRIGGER_PEKO_LUNA) and comment.author.name == PEKOFY_BOT_NAME and is_author(comment.parent(), BOT_NAME):
+                elif has_trigger(comment.body, TRIGGER_PEKO_LUNA) and is_author(comment, PEKOFY_BOT_NAME) and is_author(comment.parent(), BOT_NAME):
                     reply = get_peko_luna_message()
                 else:
                     continue
