@@ -117,14 +117,7 @@ def main(release):
                     continue
                 if is_deleted_post(comment.parent()):
                     continue
-                # Possible spam, do not reply.
-                if reply_count(comment, BOT_NAME) > 5:
-                    print("Possible spam detected. Ignoring comment.")
-                    continue
 
-                # Notify that this reply thread is closed due to possible spam.
-                if reply_count(comment, BOT_NAME) == 5:
-                    reply = get_spam_message()
                 # Reply to !nanora.
                 elif has_trigger(comment.body, TRIGGER_NANORA):
                     # Modify parent text.
@@ -141,6 +134,15 @@ def main(release):
                     reply = get_thank_message()
                 else:
                     continue
+
+                # Possible spam, do not reply.
+                if reply_count(comment, BOT_NAME) > 5:
+                    print("Possible spam detected. Ignoring comment.")
+                    continue
+
+                # Notify that this reply thread is closed due to possible spam.
+                if reply_count(comment, BOT_NAME) == 5:
+                    reply = get_spam_message()
 
                 # Reply to comment.
                 if release:
