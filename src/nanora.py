@@ -14,7 +14,7 @@ NTF_MESSAGE = "何 the fuck did you just fucking 言います about 私, you 小
     私'll have あなた know that 私 graduated top of my class in 日本語3, and 私've been involved in 色々な日本語 tutoring sessions, and 私 have over 300 perfect test scores. \
     私 am trained in 漢字, and 私 is the top letter writer in all of southern California. あなた are nothing to 私 but another weabo. \
     私 will 殺す あなた the fuck out with vocabulary the likes of which has never been 見ました before on this continent. \
-    Mark 私の fucking words. あなた thinks anata can get away with 話します-ing that クソ to 私 over the インターネット? 思う again, fucker. \
+    Mark 私の fucking words. あなた thinks あなた can get away with 話します-ing that クソ to 私 over the インターネット? 思う again, fucker. \
     As we 話します, 私 am contacting 私の secret ネット of オタクs across the USA, and あなたの IP is being traced right now so you better 準備します for the 雨, 蛆虫. \
     The 雨 that 殺す the pathetic 小さい thing あなた calls あなたの life. You're fucking 死にました'd, 赤ちゃん."
 
