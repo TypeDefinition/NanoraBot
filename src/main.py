@@ -35,12 +35,6 @@ CENSORED_SUBREDDIT_LIST = ( \
     BOT_NAME, \
     "Hololive", \
     "Himemori_Luna", \
-    "NinomaeInanis", \
-    "AmeliaWatson", \
-    "GawrGura", \
-    "CalliopeMori", \
-    "TakanashiKiara_HoloEN", \
-    "TakaMori", \
     "VirtualYoutubers", \
     "VtuberV8", \
     "HololiveYuri", \
