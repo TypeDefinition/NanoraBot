@@ -1,3 +1,4 @@
 /praw.ini
 /output.log
 /src/__pycache__
+/replied_posts.json

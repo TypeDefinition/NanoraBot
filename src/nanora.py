@@ -6,8 +6,17 @@ import regex
 BOT_NAME = "NanoraBot"
 TRIGGER_NANORA = "!nanora"
 TRIGGER_GOOD_BOT = "good bot"
+TRIGGER_NTF = "!ntf"
 FAILED_MESSAGE = "Sorry! I am unable to nanora that for some reason!"
-THANK_MESSAGES = ["Thank you nanora!", "uwu :3", "ありがちゅ！", "すっ、すき…\n\n\n\nバ、バカ！", "ぎゅ〜 <3"]
+THANK_MESSAGES = ["Thank you nanora!", "uwu :3", "ありがちゅ！", "すっ、好きのら…", "ぎゅ〜 <3"]
+SPAM_MESSAGE = "Sorry! I cannot continue to reply to this thread due to possible spam nanora."
+NTF_MESSAGE = "何 the fuck did you just fucking 言います about 私, you 小さい bitch ですか? \
+    私'll have あなた know that 私 graduated top of my class in 日本語3, and 私've been involved in 色々な日本語 tutoring sessions, and 私 have over 300 perfect test scores. \
+    私 am trained in 漢字, and 私 is the top letter writer in all of southern California. あなた are nothing to 私 but another weabo. \
+    私 will 殺す あなた the fuck out with vocabulary the likes of which has never been 見ました before on this continent. \
+    Mark 私の fucking words. あなた thinks anata can get away with 話します-ing that クソ to 私 over the インターネット? 思う again, fucker. \
+    As we 話します, 私 am contacting 私の secret ネット of オタクs across the USA, and あなたの IP is being traced right now so you better 準備します for the 雨, 蛆虫. \
+    The 雨 that 殺す the pathetic 小さい thing あなた calls あなたの life. You're fucking 死にました'd, 赤ちゃん."
 
 ZERO_WIDTH_SPACE = "\u200B" # Note: len(ZERO_WIDTH_SPACE) is 1.
 
@@ -50,6 +59,12 @@ def is_katakana(text):
 
 def get_thank_message():
     return THANK_MESSAGES[random.randrange(0, len(THANK_MESSAGES))]
+
+def get_spam_message():
+    return SPAM_MESSAGE
+
+def get_ntf_message():
+    return NTF_MESSAGE
 
 def nanora(text, censor):
     text += '\n' # Just to make the matching work if the text doesn't already include a newline at the end.

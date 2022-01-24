@@ -11,9 +11,12 @@ import os
 
 from nanora import TRIGGER_NANORA
 from nanora import TRIGGER_GOOD_BOT
+from nanora import TRIGGER_NTF
 from nanora import BOT_NAME
 from nanora import nanora
 from nanora import get_thank_message
+from nanora import get_spam_message
+from nanora import get_ntf_message
 
 # Constants
 BOOT_TIME = 5
@@ -22,27 +25,28 @@ PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/replied_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"
 
-UNCENSORED_SUBREDDIT_LIST = ( \
-    "OKBuddyHololive", \
-    "GoodAnimemes", \
-    "Hololewd")
+UNCENSORED_SUBREDDIT_LIST = (BOT_NAME, BOT_NAME)
+# UNCENSORED_SUBREDDIT_LIST = ( \
+#     "OKBuddyHololive", \
+#     "GoodAnimemes", \
+#     "Hololewd")
 
 CENSORED_SUBREDDIT_LIST = ( \
     "u_" + BOT_NAME, \
-    BOT_NAME, \
-    "Hololive", \
-    "Himemori_Luna", \
-    "NinomaeInanis", \
-    "AmeliaWatson", \
-    "GawrGura", \
-    "CalliopeMori", \
-    "TakanashiKiara_HoloEN", \
-    "TakaMori", \
-    "VirtualYoutubers", \
-    "VtuberV8", \
-    "HololiveYuri", \
-    "Singapore", \
-    "NUS")
+    BOT_NAME)
+    # "Hololive", \
+    # "Himemori_Luna", \
+    # "NinomaeInanis", \
+    # "AmeliaWatson", \
+    # "GawrGura", \
+    # "CalliopeMori", \
+    # "TakanashiKiara_HoloEN", \
+    # "TakaMori", \
+    # "VirtualYoutubers", \
+    # "VtuberV8", \
+    # "HololiveYuri", \
+    # "Singapore", \
+    # "NUS")
 
 # Logging
 # logging.basicConfig(filename=LOG_FILE, filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
@@ -86,6 +90,16 @@ def has_trigger(text, trigger):
 def is_top_level(comment):
     return comment.parent_id == comment.link_id
 
+def reply_count(comment, author):
+    count = 0
+    while comment is not None:
+        if comment.author is not None and comment.author.name == author:
+            count = count + 1
+        if is_top_level(comment):
+            break
+        comment = comment.parent()
+    return count
+
 def main(release):
     if release:
         logger.info("Running in release mode.\nApplication starting in " + str(BOOT_TIME) + " seconds.\n")
@@ -110,15 +124,25 @@ def main(release):
                     continue
                 if is_deleted_post(comment.parent()):
                     continue
-                
+                # Possible spam, do not reply.
+                if reply_count(comment, BOT_NAME) > 5:
+                    print("Possible spam detected. Ignoring comment.")
+                    continue
+
+                # Notify that this reply thread is closed due to possible spam.
+                if reply_count(comment, BOT_NAME) == 5:
+                    reply = get_spam_message()
                 # Reply to !nanora.
-                if has_trigger(comment.body, TRIGGER_NANORA):
+                elif has_trigger(comment.body, TRIGGER_NANORA):
                     # Modify parent text.
                     if is_top_level(comment):
                         reply = (comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
                     else:
                         reply = comment.parent().body
                     reply = nanora(reply, comment.subreddit.name in CENSORED_SUBREDDIT_LIST)
+                # Reply to !ntf.
+                elif has_trigger(comment.body, TRIGGER_NTF):
+                    reply = get_ntf_message()
                 # Reply to Good Bot!
                 elif has_trigger(comment.body, TRIGGER_GOOD_BOT) and comment.parent().author.name == BOT_NAME:
                     reply = get_thank_message()
