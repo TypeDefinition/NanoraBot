@@ -21,6 +21,7 @@ from nanora import get_ntf_message
 # Constants
 BOOT_TIME = 5
 WAIT_TIME = 10
+SPAM_LIMIT = 5
 PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/replied_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"
@@ -83,12 +84,14 @@ def has_trigger(text, trigger):
 def is_top_level(comment):
     return comment.parent_id == comment.link_id
 
-def reply_count(comment, author):
+def reply_count(comment, author, limit):
     count = 0
     while comment is not None:
         if comment.author is not None and comment.author.name == author:
             count = count + 1
         if is_top_level(comment):
+            break
+        if count > limit:
             break
         comment = comment.parent()
     return count
@@ -136,12 +139,11 @@ def main(release):
                     continue
 
                 # Possible spam, do not reply.
-                if reply_count(comment, BOT_NAME) > 5:
+                if reply_count(comment, BOT_NAME, SPAM_LIMIT) > SPAM_LIMIT:
                     print("Possible spam detected. Ignoring comment.")
                     continue
-
                 # Notify that this reply thread is closed due to possible spam.
-                if reply_count(comment, BOT_NAME) == 5:
+                elif reply_count(comment, BOT_NAME, SPAM_LIMIT) == SPAM_LIMIT:
                     reply = get_spam_message()
 
                 # Reply to comment.
