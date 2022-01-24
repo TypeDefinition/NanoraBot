@@ -88,10 +88,13 @@ def has_trigger(text, trigger):
 def is_top_level(comment):
     return comment.parent_id == comment.link_id
 
+def is_author(comment, author):
+    return comment is not None and comment.author is not None and comment.author.name == author
+
 def reply_count(comment, author, limit):
     count = 0
     while comment is not None:
-        if comment.author is not None and comment.author.name == author:
+        if is_author(comment, author):
             count = count + 1
         if is_top_level(comment):
             break
@@ -118,7 +121,7 @@ def main(release):
             # The first time this starts, it returns 100 historical comments. After that, it only listens for new comments.
             for comment in subreddits.stream.comments():
                 # Do not reply to our own comments.
-                if comment.author.name == BOT_NAME:
+                if is_author(comment, BOT_NAME):
                     continue
                 if is_deleted_post(comment) or is_replied_post(comment, replied_posts):
                     continue
@@ -139,8 +142,8 @@ def main(release):
                 # Reply to Good Bot!
                 elif has_trigger(comment.body, TRIGGER_GOOD_BOT) and comment.parent().author.name == BOT_NAME:
                     reply = get_thank_message()
-                # Reply to u/pekofy_bot giving up due to possible spam.
-                elif has_trigger(comment.body, TRIGGER_PEKO_LUNA) and comment.author.name == PEKOFY_BOT_NAME:
+                # Reply to u/pekofy_bot giving up replying to u/NanoraBot due to possible spam.
+                elif has_trigger(comment.body, TRIGGER_PEKO_LUNA) and comment.author.name == PEKOFY_BOT_NAME and is_author(comment.parent(), BOT_NAME):
                     reply = get_peko_luna_message()
                 else:
                     continue
