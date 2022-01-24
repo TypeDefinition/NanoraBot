@@ -25,28 +25,27 @@ PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/replied_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"
 
-UNCENSORED_SUBREDDIT_LIST = (BOT_NAME, BOT_NAME)
-# UNCENSORED_SUBREDDIT_LIST = ( \
-#     "OKBuddyHololive", \
-#     "GoodAnimemes", \
-#     "Hololewd")
+UNCENSORED_SUBREDDIT_LIST = ( \
+    "OKBuddyHololive", \
+    "GoodAnimemes", \
+    "Hololewd")
 
 CENSORED_SUBREDDIT_LIST = ( \
     "u_" + BOT_NAME, \
-    BOT_NAME)
-    # "Hololive", \
-    # "Himemori_Luna", \
-    # "NinomaeInanis", \
-    # "AmeliaWatson", \
-    # "GawrGura", \
-    # "CalliopeMori", \
-    # "TakanashiKiara_HoloEN", \
-    # "TakaMori", \
-    # "VirtualYoutubers", \
-    # "VtuberV8", \
-    # "HololiveYuri", \
-    # "Singapore", \
-    # "NUS")
+    BOT_NAME, \
+    "Hololive", \
+    "Himemori_Luna", \
+    "NinomaeInanis", \
+    "AmeliaWatson", \
+    "GawrGura", \
+    "CalliopeMori", \
+    "TakanashiKiara_HoloEN", \
+    "TakaMori", \
+    "VirtualYoutubers", \
+    "VtuberV8", \
+    "HololiveYuri", \
+    "Singapore", \
+    "NUS")
 
 # Logging
 # logging.basicConfig(filename=LOG_FILE, filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
