@@ -18,10 +18,14 @@ from nanora import get_thank_message
 from nanora import get_spam_message
 from nanora import get_ntf_message
 
+from peko_luna import PEKOFY_BOT_NAME
+from peko_luna import TRIGGER_PEKO_LUNA
+from peko_luna import get_peko_luna_message
+
 # Constants
 BOOT_TIME = 5
 WAIT_TIME = 10
-SPAM_LIMIT = 5
+SPAM_LIMIT = 10
 PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/replied_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"
@@ -135,6 +139,9 @@ def main(release):
                 # Reply to Good Bot!
                 elif has_trigger(comment.body, TRIGGER_GOOD_BOT) and comment.parent().author.name == BOT_NAME:
                     reply = get_thank_message()
+                # Reply to u/pekofy_bot giving up due to possible spam.
+                elif has_trigger(comment.body, TRIGGER_PEKO_LUNA) and comment.author.name == PEKOFY_BOT_NAME:
+                    reply = get_peko_luna_message()
                 else:
                     continue
 
@@ -145,7 +152,6 @@ def main(release):
                 # Notify that this reply thread is closed due to possible spam.
                 elif reply_count(comment, BOT_NAME, SPAM_LIMIT) == SPAM_LIMIT:
                     reply = get_spam_message()
-
                 # Reply to comment.
                 if release:
                     comment.reply(reply)
