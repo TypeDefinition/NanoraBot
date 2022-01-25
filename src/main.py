@@ -18,9 +18,9 @@ from nanora import get_thank_message
 from nanora import get_spam_message
 from nanora import get_ntf_message
 
-from peko_luna import PEKOFY_BOT_NAME
-from peko_luna import TRIGGER_PEKO_LUNA
-from peko_luna import get_peko_luna_message
+from pekonora import PEKOFY_BOT_NAME
+from pekonora import TRIGGER_PEKONORA
+from pekonora import get_pekonora_message
 
 from reply_guy import REPLY_GUY_BOT_NAME
 from reply_guy import get_reply_guy_message
@@ -146,8 +146,8 @@ def main(release):
                 elif has_trigger(comment.body, TRIGGER_GOOD_BOT) and is_author(comment.parent(), BOT_NAME):
                     reply = get_thank_message()
                 # Reply to u/pekofy_bot giving up replying to u/NanoraBot due to possible spam.
-                elif has_trigger(comment.body, TRIGGER_PEKO_LUNA) and is_author(comment, PEKOFY_BOT_NAME) and is_author(comment.parent(), BOT_NAME):
-                    reply = get_peko_luna_message()
+                elif has_trigger(comment.body, TRIGGER_PEKONORA) and is_author(comment, PEKOFY_BOT_NAME) and is_author(comment.parent(), BOT_NAME):
+                    reply = get_pekonora_message()
                 # Reply to reply-guy-bot who alleges that I'm a bot.
                 elif is_author(comment, REPLY_GUY_BOT_NAME) and is_author(comment.parent(), BOT_NAME):
                     reply = get_reply_guy_message()
