@@ -1,3 +1,5 @@
+import random
+
 PEKOFY_BOT_NAME = "pekofy_bot"
 TRIGGER_PEKONORA = "Sorry, but I can't pekofy it any further to prevent spam peko. Thank you for your understanding peko."
 PEKONORA_MESSAGES = ["Hah, I winora! I still love you though. ちゅっ! <3", \
