@@ -22,6 +22,9 @@ from peko_luna import PEKOFY_BOT_NAME
 from peko_luna import TRIGGER_PEKO_LUNA
 from peko_luna import get_peko_luna_message
 
+from reply_guy import REPLY_GUY_BOT_NAME
+from reply_guy import get_reply_guy_message
+
 # Constants
 BOOT_TIME = 5
 WAIT_TIME = 10
@@ -145,6 +148,9 @@ def main(release):
                 # Reply to u/pekofy_bot giving up replying to u/NanoraBot due to possible spam.
                 elif has_trigger(comment.body, TRIGGER_PEKO_LUNA) and is_author(comment, PEKOFY_BOT_NAME) and is_author(comment.parent(), BOT_NAME):
                     reply = get_peko_luna_message()
+                # Reply to reply-guy-bot who alleges that I'm a bot.
+                elif is_author(comment, REPLY_GUY_BOT_NAME) and is_author(comment.parent(), BOT_NAME):
+                    reply = get_reply_guy_message()
                 else:
                     continue
 
