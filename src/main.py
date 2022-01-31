@@ -20,7 +20,7 @@ from pekonora import get_pekonora_message
 
 # Constants
 BOOT_DURATION = 5
-WAIT_DURATION = 10
+WAIT_DURATION = 5
 SPAM_LIMIT = 10
 PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/replied_posts.json"
@@ -81,6 +81,9 @@ def is_replied_post(post, replied_posts):
 def has_trigger(text, trigger):
     return regex.compile(rf"{trigger}", flags=regex.IGNORECASE).search(text)
 
+def has_trigger_word(text, trigger):
+    return regex.compile(rf"\b{trigger}\b", flags=regex.IGNORECASE).search(text)
+
 def is_top_level(comment):
     return comment.parent_id == comment.link_id
 
@@ -130,7 +133,7 @@ def main(release):
                     continue
 
                 # Reply to !nanora.
-                if TRIGGER_LUNA_POST in submission.title.split():
+                if has_trigger_word(submission.title, TRIGGER_LUNA_POST):
                     reply = get_luna_submission_message()
                 else:
                     continue
