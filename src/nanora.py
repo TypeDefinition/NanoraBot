@@ -12,7 +12,7 @@ TRIGGER_GOOD_BOT = "good bot"
 TRIGGER_NTF = "!ntf"
 
 LUNA_SUBMISSION_MESSAGES = ["Luna is adult sexy wonderful beautiful cute sexy adult nanora!", \
-    "Luna is cutest beautiful genius sexy professor adult wonderful great excellent perfect nanora. えへへ!" \
+    "Luna is cutest beautiful genius sexy professor adult wonderful great excellent perfect nanora. えへへ!", \
     "ルーナが一番可愛いのら! CIJ! CIJ!"]
 FAILED_MESSAGE = "Sorry! I am unable to nanora that for some reason!"
 THANK_MESSAGES = ["Thank you nanora!", "uwu :3", "ありがちゅ！", "すっ、好きのら…", "ぎゅ〜 <3"]
