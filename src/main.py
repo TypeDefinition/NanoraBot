@@ -10,7 +10,7 @@ import pathlib
 import os
 
 from nanora import BOT_NAME
-from nanora import TRIGGER_LUNA_POST, TRIGGER_NANORA, TRIGGER_GOOD_BOT, TRIGGER_NTF
+from nanora import TRIGGER_LUNA_POST, TRIGGER_LUNA_POST_JP, TRIGGER_NANORA, TRIGGER_GOOD_BOT, TRIGGER_NTF
 from nanora import get_luna_submission_message, get_thank_message, get_spam_message, get_ntf_message
 from nanora import nanora
 
@@ -134,6 +134,8 @@ def main(release):
 
                 # Reply to !nanora.
                 if has_trigger_word(submission.title, TRIGGER_LUNA_POST):
+                    reply = get_luna_submission_message()
+                elif has_trigger_word(submission.title, TRIGGER_LUNA_POST_JP):
                     reply = get_luna_submission_message()
                 else:
                     continue

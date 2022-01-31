@@ -6,11 +6,14 @@ import regex
 BOT_NAME = "NanoraBot"
 
 TRIGGER_LUNA_POST = "luna"
+TRIGGER_LUNA_POST_JP = "ルーナ"
 TRIGGER_NANORA = "!nanora"
 TRIGGER_GOOD_BOT = "good bot"
 TRIGGER_NTF = "!ntf"
 
-LUNA_SUBMISSION_MESSAGES = ["Luna is adult sexy wonderful beautiful cute sexy adult!", "Luna is cutest beautiful genius sexy sexy adult wonderful great exellent perfect Luna. えへへ!"]
+LUNA_SUBMISSION_MESSAGES = ["Luna is adult sexy wonderful beautiful cute sexy adult!", \
+    "Luna is cutest beautiful genius sexy sexy adult wonderful great exellent perfect Luna. えへへ!" \
+    "ルーナが一番可愛い!"]
 FAILED_MESSAGE = "Sorry! I am unable to nanora that for some reason!"
 THANK_MESSAGES = ["Thank you nanora!", "uwu :3", "ありがちゅ！", "すっ、好きのら…", "ぎゅ〜 <3"]
 SPAM_MESSAGE = "Sorry! I cannot continue to reply to this thread due to possible spam nanora."
