@@ -4,9 +4,13 @@ import regex
 
 # Constants
 BOT_NAME = "NanoraBot"
+
+TRIGGER_LUNA_POST = "luna"
 TRIGGER_NANORA = "!nanora"
 TRIGGER_GOOD_BOT = "good bot"
 TRIGGER_NTF = "!ntf"
+
+LUNA_SUBMISSION_MESSAGES = ["Luna is adult sexy wonderful beautiful cute sexy adult!", "Luna is cutest beautiful genius sexy sexy adult wonderful great exellent perfect Luna. えへへ!"]
 FAILED_MESSAGE = "Sorry! I am unable to nanora that for some reason!"
 THANK_MESSAGES = ["Thank you nanora!", "uwu :3", "ありがちゅ！", "すっ、好きのら…", "ぎゅ〜 <3"]
 SPAM_MESSAGE = "Sorry! I cannot continue to reply to this thread due to possible spam nanora."
@@ -56,6 +60,9 @@ def is_hiragana(text):
 
 def is_katakana(text):
     return regex.compile(f"[{KATAKANA}]").search(text)
+
+def get_luna_submission_message():
+    return LUNA_SUBMISSION_MESSAGES[random.randrange(0, len(LUNA_SUBMISSION_MESSAGES))]
 
 def get_thank_message():
     return THANK_MESSAGES[random.randrange(0, len(THANK_MESSAGES))]

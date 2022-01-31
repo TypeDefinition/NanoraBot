@@ -9,25 +9,18 @@ import nanora
 import pathlib
 import os
 
-from nanora import TRIGGER_NANORA
-from nanora import TRIGGER_GOOD_BOT
-from nanora import TRIGGER_NTF
 from nanora import BOT_NAME
+from nanora import TRIGGER_LUNA_POST, TRIGGER_NANORA, TRIGGER_GOOD_BOT, TRIGGER_NTF
+from nanora import get_luna_submission_message, get_thank_message, get_spam_message, get_ntf_message
 from nanora import nanora
-from nanora import get_thank_message
-from nanora import get_spam_message
-from nanora import get_ntf_message
 
 from pekonora import PEKOFY_BOT_NAME
 from pekonora import TRIGGER_PEKONORA
 from pekonora import get_pekonora_message
 
-from reply_guy import REPLY_GUY_BOT_NAME
-from reply_guy import get_reply_guy_message
-
 # Constants
-BOOT_TIME = 5
-WAIT_TIME = 10
+BOOT_DURATION = 5
+WAIT_DURATION = 10
 SPAM_LIMIT = 10
 PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/replied_posts.json"
@@ -91,8 +84,8 @@ def has_trigger(text, trigger):
 def is_top_level(comment):
     return comment.parent_id == comment.link_id
 
-def is_author(comment, author):
-    return comment is not None and comment.author is not None and comment.author.name == author
+def is_author(post, author):
+    return post is not None and post.author is not None and post.author.name == author
 
 def reply_count(comment, author, limit):
     count = 0
@@ -108,8 +101,8 @@ def reply_count(comment, author, limit):
 
 def main(release):
     if release:
-        logger.info("Running in release mode.\nApplication starting in " + str(BOOT_TIME) + " seconds.\n")
-        time.sleep(BOOT_TIME)
+        logger.info("Running in release mode.\nApplication starting in " + str(BOOT_DURATION) + " seconds.\n")
+        time.sleep(BOOT_DURATION)
         replied_posts = load_file() # Load IDs of posts we've already modified.
     else:
         logger.info("Running in debug mode.\n")
@@ -117,22 +110,56 @@ def main(release):
 
     reddit = praw.Reddit(BOT_NAME)
     subreddits = reddit.subreddit("+".join(UNCENSORED_SUBREDDIT_LIST + CENSORED_SUBREDDIT_LIST))
+    submission_stream = subreddits.stream.submissions(pause_after=-1)
+    comment_stream = subreddits.stream.comments(pause_after=-1)
 
-    # Scan each comment in the subreddits.
-    while True:
+    run = True
+    while run:
         try:
-            # The first time this starts, it returns 100 historical comments. After that, it only listens for new comments.
-            for comment in subreddits.stream.comments():
-                # Do not reply to our own comments.
-                if is_author(comment, BOT_NAME):
+            # Parse submissions.
+            logger.info("Streaming submissions.")
+            for submission in submission_stream:
+                if submission is None:
+                    break
+
+                # Do not reply to our own submissions.
+                if is_author(submission, BOT_NAME):
                     continue
-                if is_deleted_post(comment) or is_replied_post(comment, replied_posts):
-                    continue
-                if is_deleted_post(comment.parent()):
+                # Do not reply to deleted or already replied submissions.
+                if is_deleted_post(submission) or is_replied_post(submission, replied_posts):
                     continue
 
                 # Reply to !nanora.
-                elif has_trigger(comment.body, TRIGGER_NANORA):
+                if TRIGGER_LUNA_POST in submission.title.split():
+                    reply = get_luna_submission_message()
+                else:
+                    continue
+
+                # Reply to submission.
+                if release:
+                    submission.reply(reply)
+                    replied_posts.add(submission.id)
+                    save_file(replied_posts)
+
+                # Log reply.
+                logger.info(f"Replied to: https://www.reddit.com{submission.permalink}")
+                logger.info(reply)
+
+            # Parse comments. The first time this starts, it returns 100 historical comments. After that, it only listens for new comments.
+            logger.info("Streaming comments.")
+            for comment in comment_stream:
+                if comment is None:
+                    break
+
+                # Do not reply to our own comments.
+                if is_author(comment, BOT_NAME):
+                    continue
+                # Do not reply to deleted or already replied comments.
+                if is_deleted_post(comment) or is_replied_post(comment, replied_posts) or is_deleted_post(comment.parent()):
+                    continue
+
+                # Reply to !nanora.
+                if has_trigger(comment.body, TRIGGER_NANORA):
                     # Modify parent text.
                     if is_top_level(comment):
                         reply = (comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
@@ -148,15 +175,12 @@ def main(release):
                 # Reply to u/pekofy_bot giving up replying to u/NanoraBot due to possible spam.
                 elif has_trigger(comment.body, TRIGGER_PEKONORA) and is_author(comment, PEKOFY_BOT_NAME) and is_author(comment.parent(), BOT_NAME):
                     reply = get_pekonora_message()
-                # Reply to reply-guy-bot who alleges that I'm a bot.
-                elif is_author(comment, REPLY_GUY_BOT_NAME) and is_author(comment.parent(), BOT_NAME):
-                    reply = get_reply_guy_message()
                 else:
                     continue
 
                 # Possible spam, do not reply.
                 if reply_count(comment, BOT_NAME, SPAM_LIMIT) > SPAM_LIMIT:
-                    print("Possible spam detected. Ignoring comment.")
+                    logger.info("Possible spam detected. Ignoring comment: https://www.reddit.com{comment.permalink}")
                     continue
                 # Notify that this reply thread is closed due to possible spam.
                 elif reply_count(comment, BOT_NAME, SPAM_LIMIT) == SPAM_LIMIT:
@@ -170,10 +194,9 @@ def main(release):
                 # Log reply.
                 logger.info(f"Replied to: https://www.reddit.com{comment.permalink}")
                 logger.info(reply)
-                
         except KeyboardInterrupt:
             logger.info("Keyboard interrupt. Terminating...")
-            break
+            run = False
         except praw.exceptions.RedditAPIException:
             logger.error(f"RedditAPIException: {traceback.format_exc()}")
         except praw.exceptions.PRAWException:
@@ -181,9 +204,9 @@ def main(release):
         except Exception:
             logger.error(f"Unhandled exception: {traceback.format_exc()}")
         finally:
-            if release:
-                logger.info(f"Program sleeping.")
-                time.sleep(WAIT_TIME)
+            if release and run:
+                logger.info(f"Program sleeping for " + str(WAIT_DURATION) + " seconds.")
+                time.sleep(WAIT_DURATION)
 
 if __name__ == "__main__":
     main(eval(sys.argv[1]))
