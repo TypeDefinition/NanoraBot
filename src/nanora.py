@@ -9,6 +9,7 @@ TRIGGER_LUNA_POST = "luna"
 TRIGGER_LUNA_POST_JP = "ルーナ"
 TRIGGER_NANORA = "!nanora"
 TRIGGER_GOOD_BOT = "good bot"
+TRIGGER_CUTE_BOT = "cute bot"
 TRIGGER_NTF = "!ntf"
 
 LUNA_SUBMISSION_MESSAGES = ["Luna is adult sexy wonderful beautiful cute sexy adult nanora!", \
