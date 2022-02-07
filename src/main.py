@@ -111,18 +111,25 @@ def main(release):
         logger.info("Running in debug mode.\n")
         replied_posts = set() # Pretend we haven't replied to any posts.
 
-    reddit = praw.Reddit(BOT_NAME)
-    subreddits = reddit.subreddit("+".join(UNCENSORED_SUBREDDIT_LIST + CENSORED_SUBREDDIT_LIST))
-
     run = True
+    empty_streams = True
     while run:
         try:
+            # If both streams are empty, then there is a chance the stream has broken due to Reddit server's going down.
+            # In that case, reinitialise the streams.
+            if empty_streams:
+                reddit = praw.Reddit(BOT_NAME)
+                subreddits = reddit.subreddit("+".join(UNCENSORED_SUBREDDIT_LIST + CENSORED_SUBREDDIT_LIST))
+                submission_stream = subreddits.stream.submissions(pause_after=-1)
+                comment_stream = subreddits.stream.comments(pause_after=-1)
+            empty_streams = True
+
             # Parse submissions.
             logger.info("Streaming submissions.")
-            submission_stream = subreddits.stream.submissions(pause_after=-1)
             for submission in submission_stream:
                 if submission is None:
                     break
+                empty_streams = False
 
                 # Do not reply to our own submissions.
                 if is_author(submission, BOT_NAME):
@@ -151,10 +158,10 @@ def main(release):
 
             # Parse comments. The first time this starts, it returns 100 historical comments. After that, it only listens for new comments.
             logger.info("Streaming comments.")
-            comment_stream = subreddits.stream.comments(pause_after=-1)
             for comment in comment_stream:
                 if comment is None:
                     break
+                empty_streams = False
 
                 # Do not reply to our own comments.
                 if is_author(comment, BOT_NAME):
