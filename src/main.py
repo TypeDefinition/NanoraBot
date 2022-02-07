@@ -113,14 +113,13 @@ def main(release):
 
     reddit = praw.Reddit(BOT_NAME)
     subreddits = reddit.subreddit("+".join(UNCENSORED_SUBREDDIT_LIST + CENSORED_SUBREDDIT_LIST))
-    submission_stream = subreddits.stream.submissions(pause_after=-1)
-    comment_stream = subreddits.stream.comments(pause_after=-1)
 
     run = True
     while run:
         try:
             # Parse submissions.
             logger.info("Streaming submissions.")
+            submission_stream = subreddits.stream.submissions(pause_after=-1)
             for submission in submission_stream:
                 if submission is None:
                     break
@@ -152,6 +151,7 @@ def main(release):
 
             # Parse comments. The first time this starts, it returns 100 historical comments. After that, it only listens for new comments.
             logger.info("Streaming comments.")
+            comment_stream = subreddits.stream.comments(pause_after=-1)
             for comment in comment_stream:
                 if comment is None:
                     break
