@@ -36,7 +36,6 @@ CENSORED_SUBREDDIT_LIST = ( \
     BOT_NAME, \
     "Hololive", \
     "Himemori_Luna", \
-    "VirtualYoutubers", \
     "VtuberV8", \
     "HololiveYuri", \
     "Singapore", \
