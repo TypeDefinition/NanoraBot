@@ -33,7 +33,7 @@ UNCENSORED_SUBREDDIT_LIST = ( \
 
 CENSORED_SUBREDDIT_LIST = ( \
     "u_" + BOT_NAME, \
-    BOT_NAME, \
+    "PrivateBotTest", \
     "Hololive", \
     "Himemori_Luna", \
     "VtuberV8", \
