@@ -20,8 +20,8 @@ from pekonora import get_pekonora_message
 
 # Constants
 BOOT_DURATION = 5
-WAIT_DURATION = 5
-SPAM_LIMIT = 10
+WAIT_DURATION = 10
+SPAM_LIMIT = 5
 PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/replied_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"

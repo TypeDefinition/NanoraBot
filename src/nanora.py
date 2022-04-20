@@ -3,7 +3,7 @@ import random
 import regex
 
 # Constants
-BOT_NAME = "NanoraBotV2"
+BOT_NAME = "NanoraBot"
 
 TRIGGER_LUNA_POST = "luna"
 TRIGGER_LUNA_POST_JP = "ルーナ"
