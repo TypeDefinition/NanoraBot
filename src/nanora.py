@@ -14,9 +14,10 @@ TRIGGER_NTF = "!ntf"
 
 LUNA_SUBMISSION_MESSAGES = ["Luna is adult sexy wonderful beautiful cute sexy adult nanora!", \
     "Luna is cutest beautiful genius sexy professor adult wonderful great excellent perfect nanora. えへへ!", \
-    "ルーナが一番可愛いのら! CIJ! CIJ!"]
+    "ルーナが一番可愛いのら! CIJ! CIJ!", \
+    "なのら…　なのら…　なのらがやがて来た！"]
 FAILED_MESSAGE = "Sorry! I am unable to nanora that for some reason!"
-THANK_MESSAGES = ["Thank you nanora!", "uwu :3", "ありがちゅ！", "すっ、好きのら…", "ぎゅ〜 <3"]
+THANK_MESSAGES = ["Thank you nanora!", "uwu :3", "ありがちゅ！", "すっ、好きのら…", "ぎゅ〜 <3", "えへへ！嬉しいのら！"]
 SPAM_MESSAGE = "Sorry! I cannot continue to reply to this thread due to possible spam nanora."
 NTF_MESSAGE = "何 the fuck did you just fucking 言います about 私, you 小さい bitch ですか? \
     私'll have あなた know that 私 graduated top of my class in 日本語3, and 私've been involved in 色々な日本語 tutoring sessions, and 私 have over 300 perfect test scores. \
