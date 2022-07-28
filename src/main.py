@@ -10,9 +10,8 @@ import pathlib
 import os
 
 from nanora import BOT_NAME
-from nanora import TRIGGER_LUNA_POST, TRIGGER_LUNA_POST_JP, TRIGGER_NANORA, TRIGGER_GOOD_BOT, TRIGGER_CUTE_BOT, TRIGGER_NTF
-from nanora import get_luna_submission_message, get_thank_message, get_spam_message, get_ntf_message
-from nanora import nanora
+from nanora import TRIGGER_LUNA_POST, TRIGGER_LUNA_POST_JP, TRIGGER_NANORA, TRIGGER_GOOD_BOT, TRIGGER_CUTE_BOT, TRIGGER_NTF, TRIGGER_QUOTE
+from nanora import get_luna_submission_message, get_thank_message, get_spam_message, get_ntf_message, get_nanora_message, get_quote_message
 
 from pekonora import PEKOFY_BOT_NAME
 from pekonora import TRIGGER_PEKONORA
@@ -26,11 +25,6 @@ PARENT_DIR = str(pathlib.Path(os.path.abspath(__file__)).parents[1])
 SAVE_FILE = PARENT_DIR + "/replied_posts.json"
 LOG_FILE =  PARENT_DIR + "/output.log"
 
-UNCENSORED_SUBREDDIT_LIST = ( \
-    "OKBuddyHololive", \
-    "GoodAnimemes", \
-    "Hololewd")
-
 CENSORED_SUBREDDIT_LIST = ( \
     "u_" + BOT_NAME, \
     "PrivateBotTest", \
@@ -40,6 +34,11 @@ CENSORED_SUBREDDIT_LIST = ( \
     "HololiveYuri", \
     "Singapore", \
     "NUS")
+
+UNCENSORED_SUBREDDIT_LIST = ( \
+    "OKBuddyHololive", \
+    "GoodAnimemes", \
+    "Hololewd")
 
 # Logging
 # logging.basicConfig(filename=LOG_FILE, filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.DEBUG)
@@ -77,9 +76,11 @@ def is_replied_post(post, replied_posts):
         return True
     return False
 
+# Does not work with special characters like underscore.
 def has_trigger(text, trigger):
     return regex.compile(rf"{trigger}", flags=regex.IGNORECASE).search(text)
 
+# Does not work with special characters like underscore.
 def has_trigger_word(text, trigger):
     return regex.compile(rf"\b{trigger}\b", flags=regex.IGNORECASE).search(text)
 
@@ -117,8 +118,10 @@ def main(release):
             # If both streams are empty, then there is a chance the stream has broken due to Reddit server's going down.
             # In that case, reinitialise the streams.
             if empty_streams:
+                logger.info("Empty stream detected. Reinitialising streams.\n")
                 reddit = praw.Reddit(BOT_NAME)
-                subreddits = reddit.subreddit("+".join(UNCENSORED_SUBREDDIT_LIST + CENSORED_SUBREDDIT_LIST))
+                # subreddits = reddit.subreddit("PrivateBotTest")
+                subreddits = reddit.subreddit("+".join(CENSORED_SUBREDDIT_LIST + UNCENSORED_SUBREDDIT_LIST))
                 submission_stream = subreddits.stream.submissions(pause_after=-1)
                 comment_stream = subreddits.stream.comments(pause_after=-1)
             empty_streams = True
@@ -173,10 +176,18 @@ def main(release):
                 if has_trigger(comment.body, TRIGGER_NANORA):
                     # Modify parent text.
                     if is_top_level(comment):
-                        reply = (comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
+                        text = (comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
                     else:
-                        reply = comment.parent().body
-                    reply = nanora(reply, comment.subreddit.name in CENSORED_SUBREDDIT_LIST)
+                        text = comment.parent().body
+                    reply = get_nanora_message(text, comment.subreddit.name in CENSORED_SUBREDDIT_LIST)
+                # Reply to !qnanora.
+                elif has_trigger(comment.body, TRIGGER_QUOTE):
+                    # Modify parent text.
+                    if is_top_level(comment):
+                        text = (comment.submission.title + '\n\n' + comment.submission.selftext if comment.submission.selftext else comment.submission.title)
+                    else:
+                        text = comment.parent().body
+                    reply = get_quote_message(comment.parent().author.name, text, comment.subreddit.name in CENSORED_SUBREDDIT_LIST)
                 # Reply to !ntf.
                 elif has_trigger(comment.body, TRIGGER_NTF):
                     reply = get_ntf_message()

@@ -11,6 +11,7 @@ TRIGGER_NANORA = "!nanora"
 TRIGGER_GOOD_BOT = "good bot"
 TRIGGER_CUTE_BOT = "cute bot"
 TRIGGER_NTF = "!ntf"
+TRIGGER_QUOTE = "!qnanora"
 
 LUNA_SUBMISSION_MESSAGES = ["Luna is adult sexy wonderful beautiful cute sexy adult nanora!", \
     "Luna is cutest beautiful genius sexy professor adult wonderful great excellent perfect nanora. えへへ!", \
@@ -28,6 +29,7 @@ NTF_MESSAGE = "何 the fuck did you just fucking 言います about 私, you 小
     The 雨 that 殺す the pathetic 小さい thing あなた calls あなたの life. You're fucking 死にました'd, 赤ちゃん."
 
 ZERO_WIDTH_SPACE = "\u200B" # Note: len(ZERO_WIDTH_SPACE) is 1.
+NBSP = "&nbsp;"
 
 ALPHANUM = "a-zA-Z0-9"
 HIRAGANA = "\u3041-\u3096"
@@ -39,9 +41,10 @@ JAP_MISC_SYMBOLS = "\u31F0-\u31FF\u3220-\u3243\u3280-\u337F"
 JAP_ALPHANUM_AND_PUNCTUATIONS = "\uFF01-\uFF5E"
 WORDS = f"[{ALPHANUM}{HIRAGANA}{KATAKANA}{KANJI}{KANJI_RADICALS}]" # Working with regex has greatly reduced my lifespan.
 
-EN_PUNCTUATION = ('.', '?', '!', '\]', '\n')
+NEW_LINE = ('\n',)
+EN_PUNCTUATION = ('.', '?', '!', '\]')
 JP_PUNCTUATION = ('。', '？', '！', '」', '・', '”', '】', '』', '；', '、')
-PUNCTUATION = EN_PUNCTUATION + JP_PUNCTUATION
+PUNCTUATION = NEW_LINE + EN_PUNCTUATION + JP_PUNCTUATION
 
 LOWERCASE_NORABLE = "[a-z]a"
 UPPERCASE_NORABLE = "[A-Z]A"
@@ -56,6 +59,8 @@ PUNCTUATION_PATTERN = rf'(?<!<|!>)([{"".join(PUNCTUATION)}]+)(?!>)'
 NANORA_PATTERN = rf'{WORDS}+(no|NO|{LOWERCASE_NORABLE}|{UPPERCASE_NORABLE}|の|ノ|{HIRAGANA_NORABLE}|{KATAKANA_NORABLE})\b'
 # Pattern matches anywhere we want to insert a keyword.
 INSERTION_PATTERN = rf'(?<!({LINK_PATTERN}))({PUNCTUATION_PATTERN}|{NANORA_PATTERN})'
+# Pattern matches new lines.
+NEW_LINE_PATTERN = rf'[{NEW_LINE}]'
 
 def is_japanese(text):
     return regex.compile(f"[{HIRAGANA}{KATAKANA}{KANJI}{KANJI_RADICALS}{HALF_WIDTH_KATAKANA_AND_PUNCTUATIONS}{JAP_MISC_SYMBOLS}{JAP_ALPHANUM_AND_PUNCTUATIONS}]").search(text)
@@ -78,9 +83,9 @@ def get_spam_message():
 def get_ntf_message():
     return NTF_MESSAGE
 
-def nanora(text, censor):
+def get_nanora_message(text, censor):
     text += '\n' # Just to make the matching work if the text doesn't already include a newline at the end.
-    modified_text = text
+    nanora_text = text
 
     offset = 0 # Everytime we insert a keyword, the length of the text grows.
     last_insert_idx = -1 # Sometimes there is a punctuation immediately after a word we nanora-ed. In that case, do not nanora it again.
@@ -138,16 +143,42 @@ def nanora(text, censor):
             continue
 
         # Insert keyword.
-        modified_text = modified_text[:insert_idx+offset]+keyword+modified_text[insert_idx+offset:]
+        nanora_text = nanora_text[:insert_idx+offset]+keyword+nanora_text[insert_idx+offset:]
         offset += len(keyword)
 
     # Check if text was successfully modified.
-    if modified_text == text:
+    if nanora_text == text:
         return FAILED_MESSAGE
     # Add zero-width whitespace to disable mentioning usernames.
-    modified_text = modified_text[:-1].replace('u/',f'u{ZERO_WIDTH_SPACE}/')
+    nanora_text = nanora_text[:-1].replace('u/',f'u{ZERO_WIDTH_SPACE}/')
     # Censor profanity.
     if censor:
-        modified_text = better_profanity.profanity.censor(modified_text, '\*')
+        nanora_text = better_profanity.profanity.censor(nanora_text, '\*')
 
-    return modified_text
+    # Return successfully modified text.
+    return nanora_text
+
+def get_quote_message(author, text, censor):
+    keyword = ">"
+    nanora_text = "\n"+get_nanora_message(text, censor)
+    quote_text = nanora_text
+
+    # Wrap the nanora_text in quotes. The Reddit character for a quote is '>'. It needs to added after every new line.
+    offset = 0 # Everytime we insert a >, the length of the text grows.
+    for match in regex.finditer(rf"{NEW_LINE_PATTERN}", nanora_text):
+        try:
+            insert_idx = match.end()
+            quote_text = quote_text[:insert_idx+offset]+keyword+quote_text[insert_idx+offset:]
+            offset += len(keyword)
+        except AttributeError:
+            continue
+
+    # Check if text was successfully modified.
+    if quote_text == nanora_text:
+        return FAILED_MESSAGE
+
+    # Append post author's username.
+    quote_text = "By u/"+author+" nanora:\n\n"+ZERO_WIDTH_SPACE+quote_text
+
+    # Return successfully modified text.
+    return quote_text
