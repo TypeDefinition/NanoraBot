@@ -41,10 +41,9 @@ JAP_MISC_SYMBOLS = "\u31F0-\u31FF\u3220-\u3243\u3280-\u337F"
 JAP_ALPHANUM_AND_PUNCTUATIONS = "\uFF01-\uFF5E"
 WORDS = f"[{ALPHANUM}{HIRAGANA}{KATAKANA}{KANJI}{KANJI_RADICALS}]" # Working with regex has greatly reduced my lifespan.
 
-NEW_LINE = ('\n',)
-EN_PUNCTUATION = ('.', '?', '!', '\]')
+EN_PUNCTUATION = ('.', '?', '!', '\]', '\n')
 JP_PUNCTUATION = ('。', '？', '！', '」', '・', '”', '】', '』', '；', '、')
-PUNCTUATION = NEW_LINE + EN_PUNCTUATION + JP_PUNCTUATION
+PUNCTUATION = EN_PUNCTUATION + JP_PUNCTUATION
 
 LOWERCASE_NORABLE = "[a-z]a"
 UPPERCASE_NORABLE = "[A-Z]A"
@@ -60,7 +59,7 @@ NANORA_PATTERN = rf'{WORDS}+(no|NO|{LOWERCASE_NORABLE}|{UPPERCASE_NORABLE}|の|�
 # Pattern matches anywhere we want to insert a keyword.
 INSERTION_PATTERN = rf'(?<!({LINK_PATTERN}))({PUNCTUATION_PATTERN}|{NANORA_PATTERN})'
 # Pattern matches new lines.
-NEW_LINE_PATTERN = rf'[{NEW_LINE}]'
+NEW_LINE_PATTERN = rf'[\n]'
 
 def is_japanese(text):
     return regex.compile(f"[{HIRAGANA}{KATAKANA}{KANJI}{KANJI_RADICALS}{HALF_WIDTH_KATAKANA_AND_PUNCTUATIONS}{JAP_MISC_SYMBOLS}{JAP_ALPHANUM_AND_PUNCTUATIONS}]").search(text)
@@ -178,7 +177,7 @@ def get_quote_message(author, text, censor):
         return FAILED_MESSAGE
 
     # Append post author's username.
-    quote_text = "By u/"+author+" nanora:\n\n"+ZERO_WIDTH_SPACE+quote_text
+    quote_text = "By u/"+author+" nanora:\n"+quote_text
 
     # Return successfully modified text.
     return quote_text
